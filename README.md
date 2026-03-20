@@ -18,7 +18,7 @@ The objectives of this project are:
 4. Use simulation to demonstrate how statistical findings may vary under different combinations of effect size, sample size, and noise.
 
 ## Data source and description
-The primary data source is the 2023 NYSDOH BRFSS Survey Data, which is publicly available from the New York State Health Data website. The original dataset is accessed programmatically in R using a download link, then imported and processed for analysis.
+The primary data source is the 2023 NYSDOH BRFSS Survey Data, which is publicly available from the New York State Health Data website. Because the original unprocessed data file exceeds GitHub's file size limit, it is not stored directly in this repository. The file can be downloaded from the public NYSDOH source using the script `Original data file.R`.
 
 Selected variables in the analytic subset include:
 - PASMIN_
