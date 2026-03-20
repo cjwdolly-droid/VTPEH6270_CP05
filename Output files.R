@@ -1,4 +1,5 @@
-# Output
+# Figures & Reports
+library(ggplot2)
 
 # the original data file
 temp <- tempfile()
@@ -65,4 +66,42 @@ ggplot(weekly_activity_possible, aes(x = weekly_activity_hr, y = weight_kg)) +
       size = 8,
       margin = margin(t = 10)
     )
+  )
+
+ggplot(all_summaries,
+       aes(x = factor(sample_size),
+           y = factor(effect_size),
+           fill = diff_means)) +
+  geom_tile(color = "white") +
+  facet_wrap(~ noise, nrow = 1) +
+  labs(
+    title = "Simulated Mean Differences across Effect Sizes, Sample Sizes, and Noise Levels",
+    x = "Sample size",
+    y = "Effect size (hours/week)",
+    fill = "Male - Female\nmean difference"
+  ) +
+  scale_fill_gradient2(
+    low = "navy",
+    mid = "white",
+    high = "red",
+    midpoint = 0
+  ) +
+  theme_minimal() +
+  theme(
+    axis.text.x = element_text(angle = 45, hjust = 1),
+    panel.grid = element_blank()
+  )
+
+# Data central tendency and dispersion
+table(brfss_sub$SEXVAR, useNA = "ifany")
+summary(brfss_sub$weight_kg)
+
+brfss_sub %>%
+  group_by(SEXVAR) %>%
+  summarise(
+    n = n(),
+    mean_wt = mean(weight_kg, na.rm = TRUE),
+    sd_wt   = sd(weight_kg, na.rm = TRUE),
+    median_wt = median(weight_kg, na.rm = TRUE),
+    iqr_wt = IQR(weight_kg, na.rm = TRUE)
   )

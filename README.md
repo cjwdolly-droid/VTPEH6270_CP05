@@ -1,31 +1,50 @@
-# VTPEH6270 CheckPoint5
+# VTPEH6270 Checkpoint 5
 
-Author: Jiawen Chen  
-Course: VTPEH6270
+## Project title and brief description
+This project explores selected variables from the 2023 New York State Department of Health Behavioral Risk Factor Surveillance System (NYSDOH BRFSS) dataset. The project includes data acquisition, variable selection, descriptive data exploration, and a simulation exercise examining how effect size, sample size, and noise level can influence statistical results. Output files include figures and other generated results from the analysis.
 
-## Project description
-This repository contains the files for Checkpoint 5.  
-The project includes data exploration and data simulation scripts.
+## Author(s) and affiliations
+Jiawen Chen  
+Cornell University
 
-## Repository structure
+## Contact information
+jc3783@cornell.edu
 
-data/
-- raw data
-- processed data
+## Research question/objectives
+The objectives of this project are:
+1. Inspect the original NYSDOH BRFSS 2023 dataset.
+2. Create a smaller analytic subset containing selected variables of interest.
+3. Explore patterns in demographic and health-related variables.
+4. Use simulation to demonstrate how statistical findings may vary under different combinations of effect size, sample size, and noise.
 
-scripts/
-- data exploration script
-- data simulation script
+## Data source and description
+The primary data source is the 2023 NYSDOH BRFSS Survey Data, which is publicly available from the New York State Health Data website. The original dataset is accessed programmatically in R using a download link, then imported and processed for analysis.
 
-output/
-- figures
-- reports
+Selected variables in the analytic subset include:
+- PASMIN_
+- WTKG3
+- GENHLTH
+- SEXVAR
+- EDUCA
+- X_IMPRACE
+- X_AGE_G
+- INCOME3
+- weight_kg
+- weekly_activity_hr
 
-## How to run
+These variables were used for descriptive exploration and simulation-related analysis.
 
-1. Open scripts in R
-2. Run data exploration script
-3. Run simulation script
+## Links to reports, apps, or other deliverables
+Project files and deliverables are organized in this repository, including:
+- Original data file
+- Processed data file
+- Data dictionary
+- Scripts for data exploration
+- Scripts for data simulation
+- Output files (Figures & Reports)
 
-## AI disclosure
-I used ChatGPT to help with wording, project organization, and debugging.
+## AI tool disclosure (if used)
+ChatGPT was used to assist with wording, organization, and troubleshooting during the development of this project and repository documentation. The analysis design, code execution, and final decisions were completed by the author.
+
+## References/citations (as relevant)
+New York State Department of Health. Behavioral Risk Factor Surveillance System (BRFSS) Survey Data 2023. Available from the New York State Health Data website.

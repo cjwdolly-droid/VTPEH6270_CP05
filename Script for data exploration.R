@@ -45,17 +45,3 @@ kable(data.frame(
   Class = c("Numeric", "Numeric", "Character", "Character", "Character", 
             "Character", "Character", "Character", "Numeric")
 ))
-
-# Data central tendency and dispersion
-table(brfss_sub$SEXVAR, useNA = "ifany")
-summary(brfss_sub$weight_kg)
-
-brfss_sub %>%
-  group_by(SEXVAR) %>%
-  summarise(
-    n = n(),
-    mean_wt = mean(weight_kg, na.rm = TRUE),
-    sd_wt   = sd(weight_kg, na.rm = TRUE),
-    median_wt = median(weight_kg, na.rm = TRUE),
-    iqr_wt = IQR(weight_kg, na.rm = TRUE)
-  )
