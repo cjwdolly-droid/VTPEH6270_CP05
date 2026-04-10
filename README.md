@@ -1,4 +1,4 @@
-# VTPEH6270 Checkpoint 5
+# VTPEH6270 Checkpoints
 
 ## Project title and brief description
 This project explores selected variables from the 2023 New York State Department of Health Behavioral Risk Factor Surveillance System (NYSDOH BRFSS) dataset. The project includes data acquisition, variable selection, descriptive data exploration, and a simulation exercise examining how effect size, sample size, and noise level can influence statistical results. Output files include figures and other generated results from the analysis.
