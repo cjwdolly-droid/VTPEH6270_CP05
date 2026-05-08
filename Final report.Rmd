@@ -1,0 +1,393 @@
+---
+title: "VTPEH 6270 - Final Report"
+author: "Jiawen Chen"
+date: "`r Sys.Date()`"
+editor_options:
+  chunk_output_type: console
+output:
+  pdf_document:
+    toc: true
+    toc_depth: 1
+    number_sections: true
+urlcolor: blue
+---
+
+# Introduction
+
+## Scientific Context
+
+Obesity remains a major public health concern in the United States and is associated with increased risks of cardiovascular disease, diabetes, hypertension, and reduced quality of life.^1,2 Physical activity is considered an important behavioral factor influencing body weight and obesity risk.^1,2 Previous studies have consistently reported that individuals with higher levels of physical activity tend to have lower body mass index (BMI), which indicates lower level of obesity.^1,2
+
+At the same time, body weight is influenced by multiple demographic and socioeconomic factors, including sex, age, and income.^3 These factors may also affect physical activity behaviors, potentially confounding the relationship between physical activity and body weight.^3 Therefore, it is important to account for these variables when evaluating associations between physical activity and body weight. This outcome variable is body weight (kg) in this study because body weight was directly available in the BRFSS dataset and allowed for straightforward interpretation of changes associated with physical activity.
+
+This study examines whether weekly physical activity is associated with body weight after adjusting for sex, age group, and income level among adults in New York State using 2023 BRFSS survey data.
+
+## Research Question
+
+Is physical activity associated with body weight among adults in New York State after adjusting for age, sex, and income?
+
+# Method
+
+## Data Source
+
+This project uses data from the 2023 New York State Behavioral Risk Factor Surveillance System (BRFSS), conducted by the New York State Department of Health in collaboration with the Centers for Disease Control and Prevention (CDC).^4 The BRFSS is a state-based telephone survey that collects information on health behaviors, chronic conditions, and demographic characteristics among adults aged 18 years and older.
+
+Data were obtained from the New York State Health Data website:
+https://health.data.ny.gov/Health/Behavioral-Risk-Factor-Surveillance-Survey-2023/tk4g-wdfe/about_data
+
+## Variables
+
+### Outcome Variable
+
+The primary outcome variable was body weight in kilograms (`weight_kg`), derived from the BRFSS variable `WTKG3`.
+
+### Explanatory Variables
+
+The primary explanatory variable was weekly physical activity hours (`weekly_activity_hr`), derived from the BRFSS physical activity variable `PA3MIN_`.
+
+Additional covariates included:
+
+- Sex (`SEXVAR`)
+- Age group (`X_AGE_G`)
+- Income level (`INCOME3`)
+
+## Data Cleaning
+
+```{r}
+
+# Set working directory
+setwd("~/Desktop/MPH R training")
+
+#Load packages
+library(dplyr)
+library(janitor)
+library(ggplot2)
+library(knitr)
+
+# Load file
+brfss <- read.csv("NYSDOH_BRFSS_SurveyData_2023.csv")
+
+# Create new subset
+brfss_sub <- brfss %>%
+  select(PA3MIN_, WTKG3, GENHLTH, SEXVAR,
+    EDUCA, X_IMPRACE, X_AGE_G, INCOME3
+  )
+
+brfss_sub <- brfss_sub %>%
+  mutate(
+    weight_kg = WTKG3 / 100,
+    weekly_activity_hr = PA3MIN_ / 60
+    ) %>%
+  filter(!is.na(weight_kg), !is.na(SEXVAR), weekly_activity_hr < 168)
+
+# Preview the data
+str(brfss_sub)
+
+```
+
+## Statistical Method
+
+This study used Multiple linear regression to examine the association between weekly physical activity and body weight while adjusting for potential confounding variables including sex, age group, and income level. Linear regression was selected because the outcome variable, body weight (kg), was continuous and the primary objective was to estimate the independent association between physical activity and body weight after controlling for demographic characteristics.
+
+Categorical predictors including sex, age group, and income level were converted to factor variables and reference categories were specified prior to model fitting. Female participants were used as the reference group for sex, and adults aged 18–24 years were used as the reference group for age category.
+
+All statistical analyses and visualizations were conducted using R software. Statistical significance was evaluated at an alpha level of 0.05.
+
+```{r fig.width=7, fig.height=5}
+
+# Convert categorical variables to factors and set reference groups
+brfss_sub$SEXVAR <- relevel(
+  factor(brfss_sub$SEXVAR),
+  ref = "Female"
+)
+
+brfss_sub$X_AGE_G <- relevel(
+  factor(brfss_sub$X_AGE_G),
+  ref = "Age 18 to 24"
+)
+
+brfss_sub$INCOME3 <- relevel(
+  factor(brfss_sub$INCOME3),
+  ref = "Less than $10,000"
+)
+
+# Fit multiple linear regression model
+model1 <- lm(
+  weight_kg ~ weekly_activity_hr +
+    X_AGE_G +
+    SEXVAR +
+    INCOME3,
+  data = brfss_sub
+)
+
+```
+
+## Assumptions check
+
+Several assumptions of linear regression were evaluated using residual diagnostic plots. Linearity and homoscedasticity were assessed using residuals versus fitted value plots. Normality of residuals was evaluated using Q-Q plots, and influential observations were assessed through residual diagnostics.
+
+```{r}
+
+# Diagnostic plot 1: Linearity and homoscedasticity
+plot(
+  model1,
+  which = 1,
+  main = "Residuals vs Fitted"
+)
+
+# Diagnostic plot 2: Normality of residuals
+plot(
+  model1,
+  which = 2,
+  main = "Normal Q-Q Plot"
+)
+
+# Diagnostic plot 3: Scale-location plot for constant variance
+plot(
+  model1,
+  which = 3,
+  main = "Scale-Location Plot"
+)
+
+# Diagnostic plot 4: Influential observations
+plot(
+  model1,
+  which = 5,
+  main = "Residuals vs Leverage"
+)
+
+```
+
+The Residuals vs Fitted plot shows that the residuals were generally scattered around zero without a strong curved pattern, suggesting that the linear relationship between predictors and body weight was reasonably appropriate. Although several outliers were present, no severe systematic pattern was observed.
+
+The Normal Q-Q plot shows that most residuals followed the reference line in the middle portion of the plot, although deviations were observed in the upper tail. This indicates that residuals were approximately normally distributed, with some influence from extreme body weight values and outliers.
+
+The Scale-Location plot shows that the spread of residuals appeared relatively consistent across fitted values, although there was a slight increase in variability at higher fitted values. Overall, the assumption of constant variance appeared reasonably satisfied.
+
+The Residuals vs Leverage plot shows that most observations had low leverage, and no points appeared to exceed Cook’s distance thresholds substantially. While a few observations showed larger residuals, there was no evidence that highly influential cases were strongly affecting the regression model.
+
+## Statistical Analysis
+
+Descriptive statistics were calculated to summarize body weight and weekly physical activity. Boxplots and histograms were used to visualize the distribution of body weight across demographic groups.
+
+```{r}
+
+summary(model1)
+
+```
+
+# Results
+
+## Descriptive Statistics
+
+```{r}
+summary_table <- brfss_sub %>%
+  group_by(SEXVAR) %>%
+  summarise(
+    Mean_Weight = mean(weight_kg, na.rm = TRUE),
+    SD_Weight = sd(weight_kg, na.rm = TRUE),
+    Mean_Activity_Hours = mean(weekly_activity_hr, na.rm = TRUE),
+    Sample_Size = n()
+  )
+
+kable(summary_table,
+      digits = 2,
+      caption = "Table 1. Descriptive statistics by sex")
+```
+
+A total of 11,322 observations were included in the analysis.
+
+## Visualization
+
+### Body Weight by Sex
+
+```{r fig.width=7, fig.height=5}
+ggplot(brfss_sub,
+       aes(x = SEXVAR,
+           y = weight_kg)) +
+  geom_boxplot(fill = "lightblue") +
+  labs(
+    title = "Figure 1. Body Weight by Sex",
+    x = "Sex",
+    y = "Body Weight (kg)"
+  ) +
+  theme_minimal()
+```
+
+Figure 1 presents the distribution of body weight by sex among adults in New York State. Male respondents generally had higher body weight compared to female respondents, as reflected by the higher median and overall distribution among males. The variability in body weight also appeared greater among males, with a wider interquartile range and more extreme high-weight outliers. Although substantial overlap existed between the two groups, the pattern suggests that sex is an important demographic factor associated with body weight. This finding is consistent with previous literature indicating sex-related differences in body composition, metabolism, and physical activity patterns.
+
+### Body Weight by Age Group
+
+```{r fig.width=8, fig.height=5}
+ggplot(brfss_sub,
+       aes(x = X_AGE_G,
+           y = weight_kg)) +
+  geom_boxplot(fill = "lightgreen") +
+  labs(
+    title = "Figure 2. Body Weight by Age Group",
+    x = "Age Group",
+    y = "Body Weight (kg)"
+  ) +
+  theme_minimal() +
+  theme(axis.text.x = element_text(angle = 45,
+                                   hjust = 1))
+```
+
+Figure 2 illustrates the distribution of body weight across age groups. Median body weight generally increased from younger adulthood to middle age, with the highest body weight observed among individuals aged 35–54 years. Among older adults aged 65 years or older, median body weight appeared slightly lower compared to middle-aged groups. The figure also demonstrates substantial variability within each age category, as indicated by the spread of the boxplots and presence of outliers. These findings suggest that age is associated with body weight and may act as an important confounding variable when examining the relationship between physical activity and body weight.
+
+### Body Weight by Income Group
+
+```{r fig.width=10, fig.height=7}
+ggplot(brfss_sub,
+       aes(x = INCOME3,
+           y = weight_kg)) +
+  geom_boxplot(fill = "lightyellow") +
+  coord_flip() +
+  labs(
+    title = "Figure 3. Body Weight by Income Group",
+    x = "Income Group",
+    y = "Body Weight (kg)"
+  ) +
+  theme_minimal()
+```
+
+Figure 3 illustrates the distribution of body weight across income groups. Median body weight appeared relatively similar across most income categories, although some middle-income groups showed slightly higher body weight compared with the highest income category. The figure also demonstrates substantial variability within each income group, as indicated by the spread of the boxplots and the presence of outliers. Overall, the differences across income categories were less pronounced than those observed for sex and age group, suggesting that income may have a weaker association with body weight in this population.
+
+### Physical Activity and Body Weight
+
+```{r fig.width=7, fig.height=5}
+ggplot(brfss_sub,
+       aes(x = weekly_activity_hr,
+           y = weight_kg)) +
+  geom_point(alpha = 0.2, color = "blue") +
+  labs(
+    title = "Figure 4. Physical Activity and Body Weight",
+    x = "Weekly Physical Activity (hours)",
+    y = "Body Weight (kg)"
+  ) +
+  theme_minimal()
+```
+
+Figure 4 displays the relationship between weekly physical activity and body weight. A slight negative association was observed, indicating that individuals reporting higher levels of physical activity tended to have somewhat lower body weight on average. However, the relationship appeared relatively weak, as substantial variation in body weight remained across all levels of physical activity. In particular, many individuals with low activity levels exhibited a wide range of body weights, while highly active individuals also demonstrated considerable variability. This pattern suggests that physical activity alone does not fully explain differences in body weight and that additional demographic, behavioral, and socioeconomic factors likely contribute to body weight variation.
+
+## Regression Analysis
+
+```{r}
+
+table_output <- as.data.frame(coef(summary(model1)))
+
+table_output$Variable <- rownames(table_output)
+rownames(table_output) <- NULL
+
+# Fix invalid encoding first
+table_output$Variable <- iconv(
+  table_output$Variable,
+  from = "",
+  to = "UTF-8",
+  sub = ""
+)
+
+# Clean variable names
+table_output$Variable <- gsub("X_AGE_G", "", table_output$Variable)
+table_output$Variable <- gsub("INCOME3", "", table_output$Variable)
+table_output$Variable <- gsub("SEXVAR", "", table_output$Variable)
+
+table_output$Variable <- gsub(
+  "weekly_activity_hr",
+  "Weekly physical activity (hours)",
+  table_output$Variable
+)
+
+table_output$Variable <- gsub(
+  "\\(Intercept\\)",
+  "Intercept",
+  table_output$Variable
+)
+
+table_output <- table_output[, c(
+  "Variable",
+  "Estimate",
+  "Std. Error",
+  "t value",
+  "Pr(>|t|)"
+)]
+
+colnames(table_output) <- c(
+  "Variable",
+  "Estimate",
+  "Standard Error",
+  "t value",
+  "p value"
+)
+
+kable(
+  table_output,
+  digits = 3,
+  caption = "Table 2. Multiple linear regression results"
+)
+
+```
+
+Table 2 presents the results of the adjusted multiple linear regression model examining the association between weekly physical activity and body weight after controlling for age group, sex, and income level.
+
+Weekly physical activity was significantly associated with body weight. Specifically, each additional hour of weekly physical activity was associated with an estimated 0.025 kg decrease in body weight (slope = -0.025, p-value = 0.043). Although this association was statistically significant, the magnitude of the effect was relatively small in practical terms. This suggests that physical activity alone may contribute only modestly to differences in body weight among adults and that additional behavioral, dietary, genetic, or environmental factors are also likely important determinants of body weight.
+
+Sex was strongly associated with body weight. Male respondents had significantly higher body weight than female respondents after adjustment for the other variables in the model (slope = 15.503, p-value < 0.001). This finding was also reflected in the boxplot visualizations, where males consistently showed higher median body weight distributions than females.
+
+Age group was significantly associated with body weight. Compared with the reference group (adults aged 18–24 years), respondents in middle-aged groups generally had higher body weight. The largest estimated differences were observed among adults aged 45–54 years (slope = 10.325, p-value < 0.001). Body weight appeared to increase from younger adulthood into middle age and then slightly decline among older adults aged 65 years or older. This pattern was consistent with the age-group boxplot presented earlier in the report.
+
+Several income categories were also significantly associated with body weight, although the direction and magnitude of these associations varied across categories. In general, lower- and middle-income groups showed slightly higher body weight compared with the reference income category (Less than $10,000). However, these effects were smaller and less consistent than the effects observed for sex and age.
+
+The adjusted R-squared value of the model was approximately 0.18, indicating that the model explained about 18% of the variation in body weight. While this suggests that the included demographic and behavioral variables contributed meaningfully to explaining body weight differences, a substantial proportion of variability remained unexplained. This is expected in population health research, where body weight is influenced by numerous biological, behavioral, social, and environmental factors that were not captured in the current dataset.
+
+Overall, the regression analysis supports the hypothesis that greater physical activity is associated with lower body weight among adults in New York State. However, the relatively small effect size indicates that physical activity should be interpreted as one contributing factor among many determinants of body weight.
+
+# Discussion
+
+This study examined the association between weekly physical activity and body weight among adults in New York State using 2023 BRFSS data. After adjusting for sex, age group, and income, higher levels of weekly physical activity were associated with lower body weight. Specifically, each additional hour of physical activity per week was associated with an estimated 0.025 kg decrease in body weight. Although the association was statistically significant, the effect size was relatively small, suggesting that physical activity alone explains only a limited proportion of variation in body weight.
+
+The findings related to sex and age were also notable. Male participants generally had substantially higher body weight compared with female participants, and middle-aged adults tended to have higher body weight than younger adults. These patterns were consistent with the descriptive visualizations and regression analysis. Differences in body composition, occupational activity, metabolism, and lifestyle factors may partially explain these observed demographic differences.
+
+The association between income and body weight appeared less consistent compared with sex and age group. While several income categories showed statistically significant associations with body weight, the magnitude and direction of these relationships varied across categories. The boxplots also demonstrated considerable variability within income groups, suggesting that socioeconomic influences on body weight are likely complex and interconnected with other behavioral and environmental factors.
+
+The scatterplot examining physical activity and body weight demonstrated a slight negative relationship between the two variables. However, substantial variation in body weight remained at nearly all levels of physical activity. This finding further supports the interpretation that body weight is influenced by multiple factors beyond physical activity alone, including dietary habits, chronic disease status, genetics, social environment, and other lifestyle behaviors.
+
+Overall, the findings are generally consistent with previous public health literature suggesting that regular physical activity contributes to healthier body weight and reduced obesity risk. At the same time, the relatively low adjusted R-squared value indicates that additional unmeasured variables likely contribute substantially to differences in body weight across individuals. Therefore, interventions aimed at improving population health should consider broader behavioral and socioeconomic determinants in addition to promoting physical activity.
+
+## Limitations
+
+This study has several limitations. First, BRFSS data are self-reported and may be subject to recall bias or reporting bias. Second, the cross-sectional study design prevents causal inference between physical activity and body weight. Third, residual confounding may still exist because dietary intake, chronic disease status, and other behavioral variables were not included in the analysis.
+
+## Future Directions
+
+Future studies could incorporate longitudinal data, dietary variables, and neighborhood-level socioeconomic measures to better understand determinants of body weight and obesity risk.
+
+# Conclusion
+
+In conclusion, this study found that higher levels of weekly physical activity were associated with slightly lower body weight among adults in New York State after adjusting for sex, age group, and income. Sex and age group demonstrated stronger associations with body weight than physical activity alone, while income showed more variable relationships across categories. Although the observed association between physical activity and body weight was statistically significant, the effect size was relatively small, highlighting the complex and multifactorial nature of body weight. These findings support existing evidence regarding the importance of physical activity while also emphasizing the need to consider demographic, behavioral, and socioeconomic factors in obesity-related research and public health interventions.
+
+# GitHub Repository
+
+GitHub repository for this project:
+
+https://github.com/cjwdolly-droid/VTPEH6270.git
+
+# Shiny App
+
+Link to Shiny app:
+
+https://dolly-cutie.shinyapps.io/bodyweightapp/
+
+# References
+
+1. Mageit M, Alhabib MY, Alshamrani M, et al. The Association Between Physical Activity and Obesity: A Systematic Review. Cureus. 2025;17(12):e99068. Published 2025 Dec 12. doi:10.7759/cureus.99068
+
+2. JQ, P. (2023). Definitions, classification, and epidemiology of Obesity. National Center for Biotechnology Information. https://pubmed.ncbi.nlm.nih.gov/25905390/
+
+3. Lee, A., Cardel, M., & Donahoo, W. (2019, October 12). Social and environmental factors influencing obesity. Endotext [Internet]. https://www.ncbi.nlm.nih.gov/books/NBK278977/ 
+
+4. Centers for Disease Control and Prevention. Behavioral Risk Factor Surveillance System Overview: BRFSS 2023.
+
+# AI Use Disclosure Statement
+
+AI tools including ChatGPT were used to assist with code refinement, formatting, debugging, and editing of scientific writing. All statistical analyses, interpretations, and final decisions were reviewed and verified by the author.
