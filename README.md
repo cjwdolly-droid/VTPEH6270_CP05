@@ -34,6 +34,14 @@ Selected variables in the analytic subset include:
 
 These variables were used for descriptive exploration and simulation-related analysis.
 
+## Shiny App
+
+The interactive Shiny app for this project is available here:
+
+[Body Weight Distribution Shiny App](https://dolly-cutie.shinyapps.io/bodyweightapp/)
+
+The app allows users to explore body weight distributions among New York State adults by sex, age group, and income level.
+
 ## Links to reports, apps, or other deliverables
 Project files and deliverables are organized in this repository, including:
 - Original data file
