@@ -1,26 +1,47 @@
-# VTPEH6270 Checkpoints
+# VTPHE6270 Final Project
 
-## Project title and brief description
-This project explores selected variables from the 2023 New York State Department of Health Behavioral Risk Factor Surveillance System (NYSDOH BRFSS) dataset. The project includes data acquisition, variable selection, descriptive data exploration, and a simulation exercise examining how effect size, sample size, and noise level can influence statistical results. Output files include figures and other generated results from the analysis.
+## Project Description
 
-## Author(s) and affiliations
-Jiawen Chen  
-Cornell University
+This project explores selected variables from the 2023 New York State Department of Health Behavioral Risk Factor Surveillance System (NYSDOH BRFSS) dataset. The analysis focuses on the relationship between weekly physical activity and body weight among adults in New York State.
 
-## Contact information
-jc3783@cornell.edu
+The project includes:
 
-## Research question/objectives
-The objectives of this project are:
-1. Inspect the original NYSDOH BRFSS 2023 dataset.
-2. Create a smaller analytic subset containing selected variables of interest.
-3. Explore patterns in demographic and health-related variables.
-4. Use simulation to demonstrate how statistical findings may vary under different combinations of effect size, sample size, and noise.
+- Data cleaning and analysis
+- Descriptive data exploration
+- Multiple linear regression analysis
+- Assumption checking
+- Interactive Shiny application
 
-## Data source and description
-The primary data source is the 2023 NYSDOH BRFSS Survey Data, which is publicly available from the New York State Health Data website. Because the original unprocessed data file exceeds GitHub's file size limit, it is not stored directly in this repository. The file can be downloaded from the public NYSDOH source using the script `Original data file.R`.
+---
 
-Selected variables in the analytic subset include:
+## Author Information
+
+**Jiawen Chen**  
+Cornell University  
+
+Contact: jc3783@cornell.edu
+
+---
+
+## Research Objectives
+
+The objectives of this project are to:
+
+- Examine the association between weekly physical activity and body weight
+- Explore demographic differences in body weight
+- Evaluate linear regression model assumptions
+- Demonstrate statistical concepts using simulation methods
+
+---
+
+## Data Source
+
+The primary data source is the 2023 NYSDOH BRFSS Survey Data.
+
+Because the original raw dataset exceeds GitHub file size limits, it is not directly stored in this repository. The data can be accessed from the New York State Health Data website and imported using the provided R scripts.
+
+Selected variables used in the analytic subset include:
+
 - PASMIN_
 - WTKG3
 - GENHLTH
@@ -32,27 +53,86 @@ Selected variables in the analytic subset include:
 - weight_kg
 - weekly_activity_hr
 
-These variables were used for descriptive exploration and simulation-related analysis.
+---
 
-## Shiny App
+## Repository Structure
 
-The interactive Shiny app for this project is available here:
+```text
+data/               # Original and processed data files
+scripts/            # Data exploration and simulation scripts
+final_report/       # Final report (.Rmd and outputs)
+shiny_app/          # Shiny application files
+project_files/      # Previous checkpoint materials
+```
 
-[Body Weight Distribution Shiny App](https://dolly-cutie.shinyapps.io/bodyweightapp/)
+---
 
-The app allows users to explore body weight distributions among New York State adults by sex, age group, and income level.
+## Required Packages
 
-## Links to reports, apps, or other deliverables
-Project files and deliverables are organized in this repository, including:
-- Original data file
-- Processed data file
+This project was developed in R using the following packages:
+
+```r
+library(tidyverse)
+library(ggplot2)
+library(dplyr)
+library(shiny)
+library(knitr)
+library(kableExtra)
+```
+
+Additional packages may be required depending on the local R environment.
+
+---
+
+## Reproducibility Instructions
+
+To reproduce this project:
+
+1. Clone this repository
+2. Install the required R packages
+3. Run scripts in the `scripts/` folder
+4. Open and knit the R Markdown file in `final_report/`
+5. Run the Shiny application using:
+
+```r
+shiny::runApp("shiny_app")
+```
+
+---
+
+## Shiny Application
+
+The interactive Shiny application allows users to explore body weight distributions among New York State adults by:
+
+- Sex
+- Age group
+- Income level
+
+---
+
+## Deliverables
+
+This repository contains:
+
+- Final report
+- Data exploration scripts
+- Simulation scripts
+- Processed dataset
 - Data dictionary
-- Scripts for data exploration
-- Scripts for data simulation
-- Output files (Figures & Reports)
+- Shiny application
+- Course checkpoint materials
 
-## AI tool disclosure
-ChatGPT was used to assist with wording, organization, and troubleshooting during the development of this project and repository documentation. The analysis design, code execution, and final decisions were completed by the author.
+---
 
-## References/citations
-New York State Department of Health. Behavioral Risk Factor Surveillance System (BRFSS) Survey Data 2023. Available from the New York State Health Data website.
+## AI Tool Disclosure
+
+ChatGPT was used to assist with wording, repository organization, troubleshooting, and documentation support. All analyses, statistical interpretations, coding decisions, and final outputs were completed and verified by the author.
+
+---
+
+## References
+
+New York State Department of Health. Behavioral Risk Factor Surveillance System (BRFSS) Survey Data 2023.
+
+Available from:  
+[https://health.data.ny.gov/](https://health.data.ny.gov/Health/Behavioral-Risk-Factor-Surveillance-Survey-2023/tk4g-wdfe/about_data)
